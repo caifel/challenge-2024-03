@@ -12,11 +12,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { Skeleton } from '@/components/ui/skeleton';
 
 import { useState } from 'react';
 
 type Data = {
-  name: string;
+  name: {
+    common: string;
+  };
 }[];
 
 const SearchForm = () => {
@@ -47,7 +50,7 @@ const SearchForm = () => {
     return (
       <Input
         className="mt-4"
-        placeholder="Search"
+        placeholder="Country name..."
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setSearchValue(e.target.value)
         }
@@ -57,7 +60,15 @@ const SearchForm = () => {
 
   const renderContent = () => {
     if (query.isLoading) {
-      return 'Loading...';
+      return (
+        <div className="flex flex-col space-y-3">
+          <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-[250px]" />
+            <Skeleton className="h-4 w-[200px]" />
+          </div>
+        </div>
+      );
     }
 
     if (query.isError) {
@@ -65,10 +76,19 @@ const SearchForm = () => {
     }
 
     if (query.isSuccess) {
+      if (!query.data?.length) {
+        return 'No results';
+      }
+
       return (
-        <ul>
+        <ul className="p-0 m-0 list-none bg-white dark:bg-zinc-800/30 rounded-xl overflow-hidden shadow-lg dark:shadow-xl border border-gray-300 dark:border-neutral-800/30 dark:text-neutral-100 overflow-y-auto max-h-60">
           {query?.data?.map?.((item, index) => (
-            <li key={index}>{item.name}</li>
+            <li
+              className="border-b border-gray-300 dark:border-neutral-800 dark:bg-zinc-800/30 dark:text-neutral-100 p-2 hover:bg-gray-200 dark:hover:bg-zinc-800/40 cursor-pointer transition-colors duration-200 ease-in-out"
+              key={index}
+            >
+              {item.name.common}
+            </li>
           ))}
         </ul>
       );
